@@ -83,8 +83,9 @@ let pruebaGetById  = async (id) => {
     return await contenedor.getById(id);
 }
 
+
 app.get("/", (req, res, next) => {
-    res.send("Hola Mundo 3");
+    res.send("Desafio Servidor con Express");
 })
 
 app.get("/productos", async (req, res, next) => {
