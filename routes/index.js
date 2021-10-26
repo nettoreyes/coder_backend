@@ -41,23 +41,21 @@ const serverRouter = (app) => {
          res.json(producto);
      });
 
-     router.put('/productos', async (req, res) => {         
+     router.put('/productos/:id', async (req, res) => {         
         //capturo al producto
-        let producto = req.body;        
+        let producto = req.body;      
+        let idProducto =  parseInt(req.params.id);  
 
         //rescato todos los productos
         let productos = await contenedor.getAll();   
-
-        //quito el producto con el mismo id
-        let productosEditados = productos.filter(prod => prod.id !== producto.id );
-
-        //agrego el producto editado
-        productosEditados.push(producto);
+        
+        //modifico el producto ingresado
+        let productosEditados = productos.map(item => item.id === idProducto ? { id:idProducto, title: producto.title, price:producto.price, thumbnail:producto.thumbnail } : item );
         
         //guardo el nuevo listado
         await contenedor.save(productosEditados);
 
-         res.json(producto);
+         res.json(productosEditados);
      });
 
      router.delete('/productos/:id', async (req, res) => {         
