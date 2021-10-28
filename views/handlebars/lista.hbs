@@ -1,0 +1,34 @@
+<div class="container">
+<h2 class="my-4"> Productos</h2>
+<a href="http://localhost:8080/" class="btn btn-primary" tabindex="-1" role="button">Crear Producto</a>
+
+    {{#if hayProductos }}
+        <div class="table-responsive">
+            <table class="table">
+            <thead>
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Imagen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each productos}}
+                    <tr>
+                    <th scope="row">{{ this.id }}</th>
+                    <td>{{ this.title }}</td>
+                    <td>{{ this.price }}</td>
+                    <td><img src="{{ this.thumbnail }}" class="img-thumbnail" width="200" height="100"></td>
+                    </tr>    
+                {{/each }}
+            </tbody>
+            </table>
+        </div>
+   
+     {{else}}
+        <div class="alert alert-danger my-4" role="alert">
+            No hay Productos!!!
+        </div>
+     {{/if}}
+</div>

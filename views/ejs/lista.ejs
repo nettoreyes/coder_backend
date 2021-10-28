@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>EJS</title>
+</head>
+<body>
+    <div class="container">
+        <h2 class="my-4"> Productos</h2>
+        <a href="http://localhost:8080/" class="btn btn-primary" tabindex="-1" role="button">Crear Producto</a>
+        
+            <% if(hayProductos) { %>
+                <div class="table-responsive">
+                    <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Imagen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% productos.forEach(item => { %>
+                            <tr>
+                            <th scope="row"><%= item.id %></th>
+                            <td><%= item.title %></td>
+                            <td><%= item.price %></td>
+                            <td><img src=<%= item.thumbnail %> class="img-thumbnail" width="200" height="100"></td>
+                            </tr>    
+                        <% }) %>
+                    </tbody>
+                    </table>
+                </div>
+           
+            <% } else { %>
+                <div class="alert alert-danger my-4" role="alert">
+                    No hay Productos!!!
+                </div>
+            <% } %>
+        </div>
+</body>
+</html>
+

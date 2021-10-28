@@ -1,0 +1,20 @@
+hmtl
+    head 
+        title='Plantilla Pug js'
+        link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous")
+    body        
+    div(class="container")
+        h2='Crear Productos'
+        a(href="/productos" class="btn btn-danger my-4") Lista de productos
+        form(action="/productos" method="POST")
+            div(class="mb-3")
+                label(class="form-label") Nombre
+                input(class="form-control" type="text" name="title")
+            div(class="mb-3")
+                label(class="form-label") Precio
+                input(class="form-control" type="text" name="price")
+            div(class="mb-3")
+                label(class="form-label") Url Imagen
+                input(class="form-control" type="text" name="thumbnail")
+
+            button(type="submit" class="btn btn-primary") Enviar

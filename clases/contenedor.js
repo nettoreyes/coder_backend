@@ -36,10 +36,14 @@ module.exports = class Contenedor {
     async getAll(){
         try{
             const contenido = await fs.promises.readFile(`./${this.nombreArchivo}`, 'utf-8');
-            return JSON.parse(contenido);           
+            if(contenido)
+                return JSON.parse(contenido);    
+            else
+                return null;       
         }
         catch(err){
-            console.log('Error al leer archivo productos: ', err );
+            console.log('Error al leer archivo productos: ', err ); 
+            return null;                            
         }    
     }
 

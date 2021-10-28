@@ -1,0 +1,23 @@
+<div class="contenedor" style="max-width: 700px; width: 100%; margin: 50px auto 0px;">
+  <h2 class="my-4">Crear  Productos</h2>
+  <a href="http://localhost:8080/productos" class="btn btn-danger my-4" tabindex="-1" role="button">Lista de productos</a>
+  <form action="http://localhost:8080/productos" method="post"  enctype="application/x-www-form-urlencoded" name="upl">
+    
+    <div class="mb-3">
+      <label for="title" class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="title" name="title" >              
+    </div>
+
+    <div class="mb-3">
+      <label for="price" class="form-label">Precio</label>
+      <input type="number" class="form-control" id="price" name="price" >              
+    </div>
+
+    <div class="mb-3">
+      <label for="thumbnail" class="form-label">Url Imagen</label>
+      <input type="text" class="form-control" id="thumbnail" name="thumbnail">              
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enviar</button>
+  </form>          
+</div>
