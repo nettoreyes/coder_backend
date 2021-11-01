@@ -23,32 +23,19 @@ app.set("views", "./views/handlebars");
 
 //**********FIN ZONA  handlebars************/
 
-//**********ZONA  PUG************/
-/*
-app.set('views', './views/pug');
-app.set('view engine', 'pug');
-*/
-//**********FIN ZONA  PUG************/
-
-
-//**********FIN ZONA EJS************/
-
-/*
-app.set('views', './views/ejs');
-app.set('view engine', 'ejs');
-*/
-//**********FIN ZONA EJS************/
-
 
 app.use(cors("*"));
 app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
 
-app.get("/", (req, res, next) => {
-    res.render("formulario");
+app.get("/", async (req, res, next) => {
+    let respuesta = await contenedor.getAll();     
+    let hayProductos = respuesta ? true : false;
+    res.render("formulario", { productos : respuesta , hayProductos: hayProductos});     
+    // res.render("formulario");
 });
 
-app.post('/productos', async (req, res) => {         
+app.post('/', async (req, res) => {         
     let producto = req.body;
     
     let productos = await contenedor.getAll(); 
@@ -71,7 +58,7 @@ app.post('/productos', async (req, res) => {
     productos.push(producto);
     await contenedor.save(productos);
 
-     res.redirect('/productos');
+     res.redirect('/');
 });
 
 app.get("/productos", async (req, res, next) => {        
