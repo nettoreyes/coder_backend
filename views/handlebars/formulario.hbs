@@ -1,107 +1,66 @@
-<div class="container">
-  <div class="row  mt-4">
-    
-    <div class="col-5">
-      <h2 >Ingrese Productos</h2>  
-      <form class="border border-primary p-2" action="http://localhost:8080" method="post"  enctype="application/x-www-form-urlencoded" name="upl">    
-        <div class="mb-3">
-          <label for="title" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="title" name="title" >              
-        </div>
-
-        <div class="mb-3">
-          <label for="price" class="form-label">Precio</label>
-          <input type="number" class="form-control" id="price" name="price" >              
-        </div>
-
-        <div class="mb-3">
-          <label for="thumbnail" class="form-label">Url Imagen</label>
-          <input type="text" class="form-control" id="thumbnail" name="thumbnail">              
-        </div>
-
-        <button type="submit" class="btn btn-success">Guardar!</button>
-      </form>
-    </div>
-
-    <div class="col-7">
-      <h2 >Centro de Mensajes</h2>
-      <div class="border border-primary p-2">
-        <form  action="http://localhost:8080/productos" method="post" name="formChat">    
-          <div class="mb-3">          
-            <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese un Email" >              
-          </div>
-          
-
-          <table class="table table-sm mt-2">
-            {{!-- <thead>
-              <tr>              
-                <th scope="col" class="w-25">Email</th>
-                <th scope="col" class="w-auto">Hora</th>
-                <th scope="col" class="w-75">Mensaje</th>
-              </tr>
-            </thead> --}}
-            <tbody>
-              <tr>              
-                <td scope="row">juan@gmail.com</td>
-                <td class="fs-6">01/11/2021 12:26:35</td>
-                <td class="fs-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. </td>
-              </tr>
-              <tr>
-                <td scope="row">maria@hotmail.com</td>              
-                <td class="fs-6">01/11/2021 12:28:21</td>
-                <td class="fs-6">Ipsa repudiandae, rem perferendis deleniti numquam corrupti quia, </td>
-              </tr>
-              <tr>
-                <td scope="row">martin@tucutu.cl</td>              
-                <td class="fs-6">01/11/2021 13:05:15</td>
-                <td class="fs-6">atque eaque illum voluptatibus fugit. Ullam eveniet adipisci facilis voluptatum?</td>
-              </tr>
-            </tbody>
-          </table>
-
-        <div class="mb-3">          
-            <input type="text" class="form-control" id="mensaje" name="mensaje" placeholder="Ingrese un Mensaje">              
-          </div>
-
-          <button type="submit" class="btn btn-primary">Enviar!</button>
-        </form>
-
-
+<div class="container border border-black p-4 my-2 bg-white">
+  <div>
+      <h2 >Ingrese Productos</h2>
+      <div class="mb-2">
+        <label for="title" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="title" name="title" >              
       </div>
+
+      <div class="mb-2">
+        <label for="price" class="form-label">Precio</label>
+        <input type="number" class="form-control" id="price" name="price" >              
+      </div>
+
+      <div class="mb-2">
+        <label for="thumbnail" class="form-label">Url Imagen</label>
+        <input type="text" class="form-control" id="thumbnail" name="thumbnail">              
+      </div>
+      
+      <button type="button" class="btn btn-success" id="btnGuardaProducto" >Guardar!</button>
+  </div>  
+  <hr/>
+
+  <div class="mt-3">
+    <h2>Lista de Productos</h2>
+    <div class="table-responsive">
+      <table class="table table-sm table-dark">
+              <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Foto</th>
+                  </tr>
+              </thead>
+              <tbody id="tablaProductos">
+              </tbody>
+      </table>
     </div>
   </div>          
   
 </div>
 
-<div class="container my-2">
-<h2 class="my-4">Lista de Productos</h2>
-    {{#if hayProductos }}
-        <div class="table-responsive">
-            <table class="table">
-            <thead>
-                <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Precio</th>
-                <th scope="col">Imagen</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each productos}}
-                    <tr>
-                    <th scope="row">{{ this.id }}</th>
-                    <td>{{ this.title }}</td>
-                    <td>{{ this.price }}</td>
-                    <td><img src="{{ this.thumbnail }}" class="img-thumbnail" width="100" height="50"></td>
-                    </tr>    
-                {{/each }}
-            </tbody>
-            </table>
-        </div>
-   
-     {{else}}
-        <div class="alert alert-danger my-4" role="alert">
-            No hay Productos!!!
-        </div>
-     {{/if}}
+
+
+<div class="container border border-black p-2 my-2 bg-white">
+      <h2 >Centro de Mensajes</h2>
+      <div class=" p-2">        
+          <div class="mb-3 row">
+            <div class="col-7">
+              <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese un Email" >                
+            </div>
+            <div class="col-5 text-center">
+              <button type="button" class="btn btn-success" id="btnIngresarChat">Ingresar al chat</button>            
+            </div>          
+          </div>
+
+          <div id="zonaChat" class="d-none">
+            <ul id="misMensajes" class="mt-2"></ul>
+            <div class="mb-3">          
+              <input type="text" class="form-control" id="mensaje" name="mensaje" placeholder="Ingrese un Mensaje">              
+            </div>
+
+            <button id="enviar_chat" class="btn btn-primary">Enviar!</button>
+          </div>
+      </div>
 </div>

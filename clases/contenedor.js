@@ -10,10 +10,10 @@ module.exports = class Contenedor {
         try{            
             let productoString = JSON.stringify(producto);
             await fs.promises.writeFile(`./${this.nombreArchivo}`, productoString, 'utf-8');
-            console.log('************Producto Guardado***************');
+            console.log('************ Guardado***************');
         }
         catch(err){
-            console.log('**********Error al guardar producto: ', err );
+            console.log('**********Error al guardar : ', err );
         }
     }
 
@@ -42,7 +42,7 @@ module.exports = class Contenedor {
                 return null;       
         }
         catch(err){
-            console.log('Error al leer archivo productos: ', err ); 
+            console.log('Error al leer archivo : ', err ); 
             return null;                            
         }    
     }
