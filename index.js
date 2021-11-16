@@ -1,8 +1,8 @@
 const express = require("express"); 
 const cors = require("cors");
-const Contenedor = require('./clases/contenedor');
-const contenedor = new Contenedor('./productos.txt');
-const contenedorChat = new Contenedor('./mensajes.txt');
+
+const db_contenedor = require('./clases/db_contenedor');
+const db_contenedor_mensajes = require('./clases/db_contenedorMensajes');
 
 const { Server: IOServer, Socket } = require("socket.io");
 const { Server: HttpServer } = require('http');
@@ -34,30 +34,46 @@ app.use(express.static('./public'));
 
 io.on('connection',  async socket => {
     console.log("Conectados por socket");
-    let productos_socket = await contenedor.getAll(); 
-    socket.emit("productos_server", productos_socket);
+    try{
+        let productos_socket = await db_contenedor.listaProductos(); 
+        socket.emit("productos_server", productos_socket);
+    }catch(error){
+        //console.log("error ", error.code);
+        if(error.code === 'ER_NO_SUCH_TABLE')
+            await db_contenedor.creaTabla();
+        
+    }
 
-    let listaMensajes = await contenedorChat.getAll(); 
-    if(listaMensajes == false)
-        listaMensajes = [];
-    io.sockets.emit("chat_server", listaMensajes); 
+    try{
+        let listaMensajes = await db_contenedor_mensajes.listaMensajes(); 
+        if(listaMensajes == false)
+            listaMensajes = [];
+        io.sockets.emit("chat_server", listaMensajes); 
+    }catch(errorMensaje){        
+        if(errorMensaje.code === 'SQLITE_ERROR'){
+            await db_contenedor_mensajes.creaTabla();
+
+            listaMensajes = [];
+            io.sockets.emit("chat_server", listaMensajes); 
+        }
+    }
     
     socket.on("notificacion", data => {
         console.log("Respuesta ", data);
     })
 
     socket.on("input", async data => {
-        listaMensajes = await contenedorChat.getAll(); 
+        listaMensajes = await db_contenedor_mensajes.listaMensajes(); 
         if(!listaMensajes)
             listaMensajes = [];
 
         listaMensajes.push(data);
-        await contenedorChat.save(listaMensajes);
+        await db_contenedor_mensajes.guardaMensaje(listaMensajes);
         io.sockets.emit("chat_server", listaMensajes); //notifica a todos 
     })
 
     socket.on("productos_cliente", async data => {        
-        productos_socket = await contenedor.getAll(); 
+        productos_socket = await db_contenedor.listaProductos(); 
         io.sockets.emit("productos_server", productos_socket); 
     })
 
@@ -65,7 +81,7 @@ io.on('connection',  async socket => {
 });
 
 async function CargaProductos(){
-    let productos_socket = await contenedor.getAll(); 
+    let productos_socket = await db_contenedor.listaProductos(); 
     io.sockets.emit("productos_server", productos_socket);
 }
 
@@ -73,31 +89,16 @@ app.get("/", async (req, res, next) => {
     res.render("formulario");   
 });
 
-app.post('/', async (req, res) => {         
-    let producto = req.body;
-    
-    let productos = await contenedor.getAll(); 
-    
-
-    let ultimoID = 0;        
-    if(productos){
-        //busco el ultimo id
-        ultimoID = Math.max(...productos.map((i) => i.id));
-        //le agrego1
-        ultimoID++; 
-    }else{
-        ultimoID=1;
-        console.log(producto);
-        productos = [];
+app.post('/', async(req, res) => {    
+    try{     
+        let producto = req.body;        
+        await db_contenedor.guardaProducto(producto);    
+        CargaProductos();
+        console.log("producto guardado")
+        res.status(200).json({ ok : 'producto creado'  });
+    }catch(error){
+        res.status(400).json({ error : error.message  });
     }
-
-    //se lo asigno al nuevo producto
-    producto.id = ultimoID;
-    productos.push(producto);
-    await contenedor.save(productos);
-
-    CargaProductos();
-    res.json(producto);
      //res.redirect('/');
 });
 

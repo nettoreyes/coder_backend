@@ -57,7 +57,9 @@ creaProducto.addEventListener("click", () => {
         headers:{'content-type' : 'application/json'},
         method: 'POST',
         body : JSON.stringify(nuevoProducto)
-    }).then(resp => {
+    }).then(resp => resp.json())
+    .then( data => {
+        console.log(data)
         document.querySelector('#title').value = '';
         document.querySelector('#price').value = '';
         document.querySelector('#thumbnail').value = '';
