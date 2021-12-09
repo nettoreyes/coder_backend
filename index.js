@@ -1,5 +1,7 @@
 const express = require("express"); 
 const cors = require("cors");
+const faker = require('faker');
+faker.locale = "es_MX";
 
 const db_contenedor = require('./clases/db_contenedor');
 const db_contenedor_mensajes = require('./clases/db_contenedorMensajes');
@@ -101,6 +103,41 @@ app.post('/', async(req, res) => {
     }
      //res.redirect('/');
 });
+
+app.get("/api/productos-test", async (req, res, next) => { 
+    let productos = [{
+        id: 1,
+        title: faker.commerce.product,
+        price: faker.commerce.price,
+        thumbnail: faker.image.image
+    },
+    {
+        id: 2,
+        title: faker.commerce.product,
+        price: faker.commerce.price,
+        thumbnail: faker.image.fashion
+    },
+    {
+        id: 3,
+        title: faker.commerce.product,
+        price: faker.commerce.price,
+        thumbnail: faker.image.cats
+    },
+    {
+        id: 4,
+        title: faker.commerce.product,
+        price: faker.commerce.price,
+        thumbnail: faker.image.food
+    },
+    {
+        id: 5,
+        title: faker.commerce.product,
+        price: faker.commerce.price,
+        thumbnail: faker.image.animals
+    }];
+    res.render("lista", {hayProductos: true, productos: productos});      
+ });
+
 
 httpServer.listen(PORT, () => {
     console.log("Conectado al servidor, puerto ", PORT);

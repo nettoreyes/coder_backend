@@ -74,6 +74,8 @@ const serverRouter = (app) => {
          res.json({"ok":"producto eliminado"});
      });
 
+     
+
 }
 
 module.exports = serverRouter;
