@@ -1,54 +1,29 @@
 <div class="container border border-black p-4 my-2 bg-white">
-  <div>
-      <h2 >Ingrese Productos</h2>
-      <div class="mb-2">
-        <label for="title" class="form-label">Nombre</label>
-        <input type="text" class="form-control" id="title" name="title" >              
-      </div>
-
-      <div class="mb-2">
-        <label for="price" class="form-label">Precio</label>
-        <input type="number" class="form-control" id="price" name="price" >              
-      </div>
-
-      <div class="mb-2">
-        <label for="thumbnail" class="form-label">Url Imagen</label>
-        <input type="text" class="form-control" id="thumbnail" name="thumbnail">              
-      </div>
-      
-      <button type="button" class="btn btn-success" id="btnGuardaProducto" >Guardar!</button>
-  </div>  
-  <hr/>
-
-  <div class="mt-3">
-    <h2>Lista de Productos</h2>
-    <div class="table-responsive">
-      <table class="table table-sm table-dark">
-              <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Precio</th>
-                    <th scope="col">Foto</th>
-                  </tr>
-              </thead>
-              <tbody id="tablaProductos">
-              </tbody>
-      </table>
-    </div>
-  </div>          
   
-</div>
-
-
 
 <div class="container border border-black p-2 my-2 bg-white">
       <h2 >Centro de Mensajes</h2>
       <div class=" p-2">        
           <div class="mb-3 row">
             <div class="col-7">
-              <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese un Email" >                
+              <input type="email" class="form-control" id="id" name="id" placeholder="Ingrese un Email" >                
             </div>
+            <div class="col-7 mt-2">
+              <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su Nombre" >                
+            </div>
+            <div class="col-7 mt-2">
+              <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingrese su Apellido" >                
+            </div>
+            <div class="col-7 mt-2">
+              <input type="number" class="form-control" id="edad" name="edad" placeholder="Ingrese su Edad" >                
+            </div>
+            <div class="col-7 mt-2">
+              <input type="text" class="form-control" id="alias" name="alias" placeholder="Ingrese su Alias" >                
+            </div>
+            <div class="col-7 mt-2">
+              <input type="text" class="form-control" id="avatar" name="avatar" placeholder="Ingrese su Avatar" >                
+            </div>
+
             <div class="col-5 text-center">
               <button type="button" class="btn btn-success" id="btnIngresarChat">Ingresar al chat</button>            
             </div>          
