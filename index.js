@@ -103,6 +103,7 @@ app.post('/', async(req, res) => {
 });
 
 httpServer.listen(PORT, () => {
+    console.log("Desafio LogIn");
     console.log("Conectado al servidor, puerto ", PORT);
 })
 
