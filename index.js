@@ -89,6 +89,14 @@ app.get("/", async (req, res, next) => {
     res.render("formulario");   
 });
 
+app.get("/login", async (req, res, next) => {    
+    res.render("login");   
+});
+
+app.get("/logout", async (req, res, next) => {    
+    res.render("logout");   
+});
+
 app.post('/', async(req, res) => {    
     try{     
         let producto = req.body;        
