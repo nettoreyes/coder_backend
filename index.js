@@ -1,5 +1,6 @@
 const express = require("express"); 
 const cors = require("cors");
+const cookieParser = require('cookie-parser');
 
 const db_contenedor = require('./clases/db_contenedor');
 const db_contenedor_mensajes = require('./clases/db_contenedorMensajes');
@@ -31,6 +32,7 @@ app.use(cors("*"));
 app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
 app.use(express.static('./public'));
+app.use(cookieParser());
 
 io.on('connection',  async socket => {
     console.log("Conectados por socket");
@@ -108,6 +110,19 @@ app.post('/', async(req, res) => {
         res.status(400).json({ error : error.message  });
     }
      //res.redirect('/');
+});
+
+//***EJEMPLO DE COOKIES */
+app.get("/set", async (req, res, next) => {    
+    res.cookie('server', 'express').send('Cookie Set');
+});
+
+app.get("/get", async (req, res, next) => {    
+    res.send(req.cookies.server);
+});
+
+app.get("/clr", async (req, res, next) => {    
+    res.clearCookie('server').send('Cookie clear')
 });
 
 httpServer.listen(PORT, () => {
