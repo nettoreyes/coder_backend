@@ -1,6 +1,7 @@
 const express = require("express"); 
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 const db_contenedor = require('./clases/db_contenedor');
 const db_contenedor_mensajes = require('./clases/db_contenedorMensajes');
@@ -8,7 +9,7 @@ const db_contenedor_mensajes = require('./clases/db_contenedorMensajes');
 const { Server: IOServer, Socket } = require("socket.io");
 const { Server: HttpServer } = require('http');
 
-const PORT = 8080;
+const PORT = 8081;
 
 const app = express();
 const httpServer = new HttpServer(app);
@@ -33,14 +34,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
 app.use(express.static('./public'));
 app.use(cookieParser());
+app.use(session(
+    {
+        secret: 'secreto',
+        resave: true,
+        saveUninitialized: true
+    }
+))
 
 io.on('connection',  async socket => {
     console.log("Conectados por socket");
     try{
         let productos_socket = await db_contenedor.listaProductos(); 
         socket.emit("productos_server", productos_socket);
-    }catch(error){
-        //console.log("error ", error.code);
+    }catch(error){        
         if(error.code === 'ER_NO_SUCH_TABLE')
             await db_contenedor.creaTabla();
         
@@ -88,20 +95,28 @@ async function CargaProductos(){
 }
 
 app.get("/", async (req, res, next) => {    
-    res.render("formulario");   
+    
+     const usuario = req.session.usuario;
+
+    if(usuario){
+        return res.render("formulario");
+    }
+
+    res.redirect('/login');   
 });
 
-app.get("/login", async (req, res, next) => {    
+app.get("/login", async (req, res, next) => {   
+    if(req.session.usuario){        
+        return res.render("formulario", {'usuario': req.session.usuario });
+    }
     res.render("login");   
 });
 
-app.get("/logout", async (req, res, next) => {    
-    res.render("logout");   
-});
+
 
 app.post('/', async(req, res) => {    
     try{     
-        let producto = req.body;        
+        let producto = req.body;           
         await db_contenedor.guardaProducto(producto);    
         CargaProductos();
         console.log("producto guardado")
@@ -111,6 +126,36 @@ app.post('/', async(req, res) => {
     }
      //res.redirect('/');
 });
+
+app.post('/login', async(req, res) => {    
+    try{    
+
+        let { usuario } = req.body;    
+
+        if(usuario){
+            req.session.usuario = usuario;                
+            return res.cookie('userApp', usuario).json({'usuario': req.session.usuario });
+        }
+        
+    }catch(error){
+        res.status(400).json({ error : error.message  });
+    }
+});
+
+app.get("/logout", (req, res, next) => {    
+    
+    req.session.destroy( err => {
+        if( !err ){
+            return res.render("logout")
+        }
+        else{
+            return res.send({ status: 'Logout Error', body: err });
+        }
+    })
+
+});
+
+
 
 //***EJEMPLO DE COOKIES */
 app.get("/set", async (req, res, next) => {    
