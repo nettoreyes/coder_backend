@@ -1,7 +1,14 @@
 const express = require("express"); 
 const cors = require("cors");
+
+const dotenv = require('dotenv');
+dotenv.config();
+
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+
+const MongoStore = require('connect-mongo');
+const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true }
 
 const db_contenedor = require('./clases/db_contenedor');
 const db_contenedor_mensajes = require('./clases/db_contenedorMensajes');
@@ -10,6 +17,10 @@ const { Server: IOServer, Socket } = require("socket.io");
 const { Server: HttpServer } = require('http');
 
 const PORT = 8081;
+
+
+
+
 
 const app = express();
 const httpServer = new HttpServer(app);
@@ -34,11 +45,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
 app.use(express.static('./public'));
 app.use(cookieParser());
-app.use(session(
-    {
+// app.use(session(
+//     {
+//         secret: 'secreto',
+//         resave: true,
+//         saveUninitialized: true
+//     }
+// ))
+
+app.use(session({
+        store: MongoStore.create({            
+            mongoUrl: process.env.DB_MONGO,
+            mongoOptions: advancedOptions
+        }),
         secret: 'secreto',
-        resave: true,
-        saveUninitialized: true
+        resave: false,
+        saveUninitialized: false
     }
 ))
 
@@ -134,7 +156,7 @@ app.post('/login', async(req, res) => {
 
         if(usuario){
             req.session.usuario = usuario;                
-            return res.cookie('userApp', usuario).json({'usuario': req.session.usuario });
+            return res.cookie('userApp', usuario, { maxAge: 600000 }).json({'usuario': req.session.usuario });
         }
         
     }catch(error){
