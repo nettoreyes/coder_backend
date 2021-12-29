@@ -45,13 +45,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
 app.use(express.static('./public'));
 app.use(cookieParser());
-// app.use(session(
-//     {
-//         secret: 'secreto',
-//         resave: true,
-//         saveUninitialized: true
-//     }
-// ))
+
 
 app.use(session({
         store: MongoStore.create({            
