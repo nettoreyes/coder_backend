@@ -12,14 +12,22 @@ const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true }
 
 const db_contenedor = require('./clases/db_contenedor');
 const db_contenedor_mensajes = require('./clases/db_contenedorMensajes');
+const db_contenedor_mongo = require('./clases/db_contenedor_mongo');
+
+const passport = require('passport');
+const bcrypt = require('bcrypt');
+const LocalStrategy = require('passport-local').Strategy;
 
 const { Server: IOServer, Socket } = require("socket.io");
 const { Server: HttpServer } = require('http');
 
+const DatabaseMongoDB = require('./clases/DatabaseMongoDB');
+const conexionMongoDB = new DatabaseMongoDB();
+
 const PORT = 8081;
 
 
-
+conexionMongoDB.abrirConexionBD();
 
 
 const app = express();
@@ -127,6 +135,13 @@ app.get("/login", async (req, res, next) => {
     res.render("login");   
 });
 
+app.get("/registro", async (req, res, next) => {   
+    if(req.session.usuario){        
+        return res.render("formulario", {'usuario': req.session.usuario });
+    }
+    res.render("registro");   
+});
+
 
 
 app.post('/', async(req, res) => {    
@@ -145,11 +160,47 @@ app.post('/', async(req, res) => {
 app.post('/login', async(req, res) => {    
     try{    
 
-        let { usuario } = req.body;    
+        let { usuario, password } = req.body;  
+        // let clave = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
 
         if(usuario){
-            req.session.usuario = usuario;                
-            return res.cookie('userApp', usuario, { maxAge: 600000 }).json({'usuario': req.session.usuario });
+             
+            const respuesta = await db_contenedor_mongo.buscaUsuario( usuario );
+            console.log( respuesta );
+
+            const claveOK = bcrypt.compareSync(password, respuesta.clave);
+
+            console.log( claveOK );
+
+            if(claveOK){
+                req.session.usuario = usuario; 
+                return res.cookie('userApp', usuario, { maxAge: 600000 }).json({'usuario': req.session.usuario });
+            }else{
+                res.status(200).json({ error : 'usuario o password no corresponde'  });
+            }
+        }
+        
+    }catch(error){
+        res.status(400).json({ error : error.message  });
+    }
+});
+
+app.post('/registro', async(req, res) => {    
+    try{    
+
+        let { usuario, password } = req.body;    
+        
+        console.log( usuario + "  " + password );
+
+        let clave = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+
+        if(usuario){
+            
+            const respuesta = await db_contenedor_mongo.guardaUsuario( { nombre: usuario, clave } );
+
+            console.log( respuesta );
+
+            return res.status(200).json({ok: 'usuario registrado'});
         }
         
     }catch(error){
