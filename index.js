@@ -27,6 +27,10 @@ const conexionMongoDB = new DatabaseMongoDB();
 const PORT = 8081;
 
 
+
+
+
+
 conexionMongoDB.abrirConexionBD();
 
 
@@ -54,6 +58,8 @@ app.use(express.urlencoded({ extended : true }));
 app.use(express.static('./public'));
 app.use(cookieParser());
 
+
+
 app.use(session({
         store: MongoStore.create({            
             mongoUrl: process.env.DB_MONGO,
@@ -64,6 +70,75 @@ app.use(session({
         saveUninitialized: false
     }
 ))
+
+// inicializamos passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
+passport.use('login', new LocalStrategy({passReqToCallback: true}, async function (req, username, password, done) {    
+    //busco al usuario por el nombre    
+    let usuario = await db_contenedor_mongo.buscaUsuario(username);
+    
+        if (!usuario) {
+            console.log('usuario no encontrado con el nombre:', username);
+            return done(null, false, console.log('mensaje', 'usuario no encontrado'));
+        } else {
+            //comparto la contraseña con la registrada
+            const claveOK = bcrypt.compareSync(password, usuario.clave);
+            //if (!isValidPassword(usuario, password)) {
+            if(!claveOK){
+                console.log('contraseña invalida');
+                return done(null, false, console.log('mensaje', 'contraseña invalida'));
+            } else {
+                return done(null, usuario);
+            }
+        }
+    })
+);
+
+passport.use('signup', new LocalStrategy({passReqToCallback: true}, async function (req, username, password, done) {
+
+    let usuario = await db_contenedor_mongo.buscaUsuario(username);
+
+    if (usuario) {
+        console.log('usuario ya existe');
+        return done(null, false, console.log('mensaje', 'usuario ya existe'));
+    } else {        
+
+        let clave = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+
+        
+        
+        const respuesta = await db_contenedor_mongo.guardaUsuario( { nombre: username, clave } );
+
+        console.log( respuesta );
+
+
+        let newUser = {
+            id: 1,
+            username,
+            clave
+        };
+
+        return done(null, newUser);
+    }
+})
+);
+
+passport.serializeUser(function (user, done) {
+    //console.log( user )
+    done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {    
+    //let user = usuarios.find(u => u.id == id);
+    //let user = await db_contenedor_mongo.buscaUsuario(username);
+    let user = 'Pruebas';
+    return done(null, user);
+});
+
 
 io.on('connection',  async socket => {
     console.log("Conectados por socket");
@@ -142,8 +217,6 @@ app.get("/registro", async (req, res, next) => {
     res.render("registro");   
 });
 
-
-
 app.post('/', async(req, res) => {    
     try{     
         let producto = req.body;           
@@ -157,56 +230,57 @@ app.post('/', async(req, res) => {
      //res.redirect('/');
 });
 
-app.post('/login', async(req, res) => {    
-    try{    
 
-        let { usuario, password } = req.body;  
-        // let clave = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
-
-        if(usuario){
-             
-            const respuesta = await db_contenedor_mongo.buscaUsuario( usuario );
-            console.log( respuesta );
-
-            const claveOK = bcrypt.compareSync(password, respuesta.clave);
-
-            console.log( claveOK );
-
-            if(claveOK){
-                req.session.usuario = usuario; 
-                return res.cookie('userApp', usuario, { maxAge: 600000 }).json({'usuario': req.session.usuario });
-            }else{
-                res.status(200).json({ error : 'usuario o password no corresponde'  });
-            }
-        }
-        
-    }catch(error){
-        res.status(400).json({ error : error.message  });
-    }
+app.post('/login', passport.authenticate('login', { failureRedirect: '/faillogin' }), (req, res) => {
+    //console.log('login', req.body);        
+    //res.send(req.body);
+    let { username } = req.body; 
+    req.session.usuario = username; 
+    return res.cookie('userApp', username, { maxAge: 600000 }).json({'usuario': req.session.usuario });
 });
 
+
+app.get('/faillogin', (req, res) => {
+    res.status(400).send({ error: 'usuario o contraseña invalida' });
+});
+
+
+app.post('/registro', passport.authenticate('signup', { failureRedirect: '/failsignup' }), (req, res) => {
+    // res.send(req.body);
+    res.status(200).json({ok: 'usuario registrado existosamente'});
+});
+
+app.get('/failsignup', (req, res) => {    
+    res.status(200).json({ ok : 'Usuario ya existe'  });
+});
+
+/*
 app.post('/registro', async(req, res) => {    
     try{    
 
         let { usuario, password } = req.body;    
         
-        console.log( usuario + "  " + password );
+        const usuarioExiste = await db_contenedor_mongo.buscaUsuario( usuario );
+        console.log( usuarioExiste );
 
-        let clave = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+        if(!usuarioExiste){
+            let clave = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
 
-        if(usuario){
-            
-            const respuesta = await db_contenedor_mongo.guardaUsuario( { nombre: usuario, clave } );
-
-            console.log( respuesta );
-
-            return res.status(200).json({ok: 'usuario registrado'});
+            if(usuario){
+                
+                const respuesta = await db_contenedor_mongo.guardaUsuario( { nombre: usuario, clave } );
+                return res.status(200).json({ok: 'usuario registrado existosamente'});
+            }
+        }
+        else{
+            res.status(200).json({ ok : 'usuario ya existe, intente con otro nombre'  });
         }
         
     }catch(error){
         res.status(400).json({ error : error.message  });
     }
 });
+*/
 
 app.get("/logout", (req, res, next) => {    
     

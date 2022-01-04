@@ -125,13 +125,13 @@ const botonLogin = document.getElementById("btnLogin");
 if(botonLogin){
     botonLogin.addEventListener("click", () => {
 
-        const usuario = document.querySelector('#txtUsuario').value;
+        const username = document.querySelector('#txtUsuario').value;
         const password = document.querySelector('#txtPassword').value;
 
         document.querySelector('#alerta').innerHTML = ``; //limpio la alerta
         
         const loginUsuario = {
-            usuario,
+            username,
             password
         };    
 
@@ -161,12 +161,12 @@ const botonRegistro = document.getElementById("btnRegistro");
 if(botonRegistro){
     botonRegistro.addEventListener("click", () => {
 
-        const usuario = document.querySelector('#txtUsuarioRegistro').value;
+        const username = document.querySelector('#txtUsuarioRegistro').value;
         const password = document.querySelector('#txtPasswordRegistro').value;
         document.querySelector('#alertaRegistro').innerHTML = ``; //limpio la alerta
         
         const loginUsuario = {
-            usuario,
+            username,
             password
         };    
 
