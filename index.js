@@ -7,9 +7,6 @@ dotenv.config();
 const config = require('./config.js');
 const parseArgs = require('minimist');
 
-
-
-
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
@@ -35,6 +32,10 @@ const conexionMongoDB = new DatabaseMongoDB();
 const options = { default: { PORT: 8080 } }
 const args = parseArgs(process.argv.slice(2), options);
 
+const { fork } = require('child_process');
+
+
+
 //para pasar el puerto 
 // node index.js --PORT 8081
 const PORT = args.PORT;
@@ -50,7 +51,6 @@ conexionMongoDB.abrirConexionBD();
 const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOServer(httpServer);
-
 
 
 const handlebars = require("express-handlebars");
@@ -296,10 +296,6 @@ app.get("/clr", async (req, res, next) => {
     res.clearCookie('server').send('Cookie clear')
 });
 
-httpServer.listen(PORT, () => {
-    console.log("Desafio Objeto Process");
-    console.log("Conectado al servidor, puerto ", PORT);
-})
 
 //************DESAFIO OBJETO PROCESS */
 app.get("/info", (req, res, next) => {    
@@ -316,9 +312,35 @@ app.get("/info", (req, res, next) => {
     res.json(objetoProcess);
 });
 
-app.get("/randoms", (req, res, next) => {        
-    res.send('randoms')
+app.get("/randoms", (req, res, next) => {   
+
+    const procesoFork = fork('./calculo.js');
+    
+    let cant = req.query.cant;
+   
+    if(cant === undefined)
+        cant = 100000000;    
+   
+    procesoFork.on('message', msg => {
+        //console.log('mensaje del hijo: ', msg);        
+        res.json(msg);
+    });
+
+    //console.log('inicio padre: ');
+    procesoFork.send(cant);
+    
 });
+
+//************DESAFIO OBJETO PROCESS */
+
+
+
+httpServer.listen(PORT, () => {
+    console.log("Desafio Objeto Process");
+    console.log("Conectado al servidor, puerto ", PORT);
+})
+
+
 
 
 
