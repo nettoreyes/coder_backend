@@ -4,6 +4,12 @@ const cors = require("cors");
 const dotenv = require('dotenv');
 dotenv.config();
 
+const config = require('./config.js');
+const parseArgs = require('minimist');
+
+
+
+
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
@@ -24,7 +30,14 @@ const { Server: HttpServer } = require('http');
 const DatabaseMongoDB = require('./clases/DatabaseMongoDB');
 const conexionMongoDB = new DatabaseMongoDB();
 
-const PORT = 8081;
+
+//configuro los valores por defecto del puerto en caso que no lo envien
+const options = { default: { PORT: 8080 } }
+const args = parseArgs(process.argv.slice(2), options);
+
+//para pasar el puerto 
+// node index.js --PORT 8081
+const PORT = args.PORT;
 
 
 
@@ -254,33 +267,6 @@ app.get('/failsignup', (req, res) => {
     res.status(200).json({ ok : 'Usuario ya existe'  });
 });
 
-/*
-app.post('/registro', async(req, res) => {    
-    try{    
-
-        let { usuario, password } = req.body;    
-        
-        const usuarioExiste = await db_contenedor_mongo.buscaUsuario( usuario );
-        console.log( usuarioExiste );
-
-        if(!usuarioExiste){
-            let clave = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
-
-            if(usuario){
-                
-                const respuesta = await db_contenedor_mongo.guardaUsuario( { nombre: usuario, clave } );
-                return res.status(200).json({ok: 'usuario registrado existosamente'});
-            }
-        }
-        else{
-            res.status(200).json({ ok : 'usuario ya existe, intente con otro nombre'  });
-        }
-        
-    }catch(error){
-        res.status(400).json({ error : error.message  });
-    }
-});
-*/
 
 app.get("/logout", (req, res, next) => {    
     
@@ -315,6 +301,24 @@ httpServer.listen(PORT, () => {
     console.log("Conectado al servidor, puerto ", PORT);
 })
 
+//************DESAFIO OBJETO PROCESS */
+app.get("/info", (req, res, next) => {    
+    const objetoProcess = {
+            'sistema operativo':process.platform,
+            'version de node' :process.version,
+            'uso de memoria' : process.memoryUsage(),
+            'directorio actual del proceso' : process.cwd(),
+            'id del proceso' : process.pid,
+            'titulo del proceso' : process.title
+        };
+    
+    
+    res.json(objetoProcess);
+});
+
+app.get("/randoms", (req, res, next) => {        
+    res.send('randoms')
+});
 
 
 

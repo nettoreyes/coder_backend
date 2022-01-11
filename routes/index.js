@@ -1,5 +1,4 @@
 const { Router } = require("express");
-const { restart } = require("nodemon");
 const router = Router();
 const Contenedor = require('../clases/contenedor.js');
 const contenedor = new Contenedor('./productos.txt');
@@ -73,6 +72,10 @@ const serverRouter = (app) => {
 
          res.json({"ok":"producto eliminado"});
      });
+
+     router.get("/randoms/", (req, res, next) => {  
+      res.json({ok:'respuesta'});        
+   });
 
 }
 
