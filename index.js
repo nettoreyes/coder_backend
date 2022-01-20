@@ -4,6 +4,11 @@ const cors = require("cors");
 const dotenv = require('dotenv');
 dotenv.config();
 
+
+
+const cluster = require('cluster');
+
+
 const config = require('./config.js');
 const parseArgs = require('minimist');
 
@@ -35,15 +40,17 @@ const args = parseArgs(process.argv.slice(2), options);
 const { fork } = require('child_process');
 
 
+console.log(args)
 
 //para pasar el puerto 
 // node index.js --PORT 8081
 const PORT = args.PORT;
+const MODO = args.MODO ? args.MODO : "FORK";
 
 
 
 
-
+console.log(MODO)
 
 conexionMongoDB.abrirConexionBD();
 
@@ -297,15 +304,21 @@ app.get("/clr", async (req, res, next) => {
 });
 
 
-//************DESAFIO OBJETO PROCESS */
-app.get("/info", (req, res, next) => {    
+//************DESAFIO OBJETO PROCESS  yservidor con balance de carga*/
+app.get("/info", (req, res, next) => {   
+    
+    let numCpu =  require('os').cpus().length;   
+
+
     const objetoProcess = {
             'sistema operativo':process.platform,
             'version de node' :process.version,
             'uso de memoria' : process.memoryUsage(),
             'directorio actual del proceso' : process.cwd(),
             'id del proceso' : process.pid,
-            'titulo del proceso' : process.title
+            'titulo del proceso' : process.title,            
+            'Modo' : MODO,
+            'Numero de CPUS' : numCpu
         };
     
     
